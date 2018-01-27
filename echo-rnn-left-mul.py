@@ -10,6 +10,7 @@
 # ------------------------------------------------------------------------------
 
 import sys
+import os
 import numpy as np
 import tensorflow as tf
 
@@ -269,9 +270,14 @@ class LeftMulModel:
         # return the prediction as list 
         with tf.Session(graph=self.model_graph) as sess:
             predictions = []
-            # restore the variable learned
-            self.saver.restore(sess, "./models/LeftMulModel.ckpt")
-            print("Model restored from file.")
+            # check if the model exist
+            if os.path.exists("./models/LeftMulModel.ckpt.index") and path.exists("./models/LeftMulModel.ckpt.meta"): 
+                # restore the variable learned
+                self.saver.restore(sess, "./models/LeftMulModel.ckpt")
+                print("Model restored from file.")
+            else:
+                print("\n\nModel is not available or it has not been trained yet!")
+                return None
             # init the state for the first time
             current_state = np.zeros((self.state_rows, self.state_cols))
             # for all inputs execute the model
@@ -312,7 +318,9 @@ if __name__ == "__main__":
         model = LeftMulModel(num_of_classes = NUM_OF_CLASSES, train_seq_len = MAX_TRAIN_SEQUENCE, state_size = STATE_DIM)
         # LEARN
         if(sys.argv[1] == "LEARN"):
-            
+            # check if the directory for the model exists
+            if not os.path.exists("./models"):
+                os.mkdir("./models")
 
             x,y           = generate_training_data(num_of_classes = model.num_of_classes, num_of_data = TRAIN_DATA_DIM, echo_delay = ECHO_DELAY)
             x,_           = reshape_for_batch(x, batch_dim = 1, batch_len = model.train_seq_len)
@@ -328,11 +336,12 @@ if __name__ == "__main__":
             model.make_model_graph()   
             predictions = model.execute(x)
                 
-            for i in range(TEST_DATA_DIM):
-                if(i < ECHO_DELAY):
-                    print("input = ", x[i] , "output = ", predictions[i] )              
-                else:
-                    print("input = ", x[i] , "output = ", predictions[i], " (" , x[i-ECHO_DELAY] , " was the input 3 steps ago)")
+            if predictions is not None:
+                for i in range(TEST_DATA_DIM):
+                    if(i < ECHO_DELAY):
+                        print("input = ", x[i] , "output = ", predictions[i] )              
+                    else:
+                        print("input = ", x[i] , "output = ", predictions[i], " (" , x[i-ECHO_DELAY] , " was the input 3 steps ago)")
         else:
             print("[ERROR]: Wrong argument name")
             print("This script must be called with 1 argument")
