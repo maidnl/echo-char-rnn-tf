@@ -1,2 +1,2 @@
-model_checkpoint_path: "LeftMulModel.ckpt"
-all_model_checkpoint_paths: "LeftMulModel.ckpt"
+model_checkpoint_path: "RightMulModel.ckpt"
+all_model_checkpoint_paths: "RightMulModel.ckpt"
