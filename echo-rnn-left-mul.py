@@ -271,7 +271,7 @@ class LeftMulModel:
         with tf.Session(graph=self.model_graph) as sess:
             predictions = []
             # check if the model exist
-            if os.path.exists("./models/LeftMulModel.ckpt.index") and path.exists("./models/LeftMulModel.ckpt.meta"): 
+            if os.path.exists("./models/LeftMulModel.ckpt.index") and os.path.exists("./models/LeftMulModel.ckpt.meta"): 
                 # restore the variable learned
                 self.saver.restore(sess, "./models/LeftMulModel.ckpt")
                 print("Model restored from file.")
